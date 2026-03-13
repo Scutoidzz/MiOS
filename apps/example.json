@@ -1,0 +1,10 @@
+{
+  "manifest": {
+    "name": "Calculator",
+    "icon": "/e",
+    "version": "1.0"
+  },
+  "files": {
+    "index.html": "/apps/example.json"
+  }
+}

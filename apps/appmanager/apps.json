@@ -1,0 +1,5 @@
+[
+  { "icon": "/apps/example.png", "path": "/apps/example.json" },
+  { "icon": "/apps/appmanager/icon.png", "path": "/apps/appmanager/appmanager.json"},
+  { "icon": "/apps/settings/icon.png", "path": "/apps/settings/settings.json"}
+]

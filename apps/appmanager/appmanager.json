@@ -1,0 +1,10 @@
+{
+  "manifest": {
+    "name": "App Manager",
+    "icon": "|a",
+    "version": "0.1"
+  },
+  "files": {
+    "index.html": "/apps/appmanager/index.html"
+  }
+}

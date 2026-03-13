@@ -1,0 +1,35 @@
+    * {
+         margin: 0; 
+         padding: 0; 
+         box-sizing: border-box; 
+        }
+        
+    body { 
+        background-image: url(../setup/wallpaper.jpeg);
+        height: 100vh; 
+        overflow: hidden; 
+    }
+    
+    #dock {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        gap: 15px;
+        background: rgba(0, 0, 0, 0.5);
+        padding: 10px 20px;
+        border-radius: 25px;
+    }
+    
+    .dock-item {
+        cursor: pointer;
+        color: white;
+        font-size: 24px;
+        padding: 5px 10px;
+        transition: transform 0.2s;
+    }
+    
+    .dock-item:hover {
+        transform: scale(1.2);
+    }

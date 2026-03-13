@@ -1,0 +1,10 @@
+{
+  "manifest": {
+    "name": "Settings",
+    "icon": "|/s",
+    "version": "0.1"
+  },
+  "files": {
+    "index.html": "/apps/settings/index.html"
+  }
+}
