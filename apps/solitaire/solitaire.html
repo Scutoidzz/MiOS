@@ -195,6 +195,7 @@
             }
 
             function showModal(message) {
+                if (state.modalMessage === message) return;
                 state.modalMessage = message;
                 render();
             }
@@ -301,50 +302,6 @@
 
 
 
-            function showModal(message) {
-                state.modalMessage = message;
-                render();
-            }
-
-            function closeModal() {
-                state.modalMessage = '';
-                render();
-            }
-
-            function hasValidMoves() {
-                if (state.stock.length || state.waste.length) return true;
-
-                for (var c = 0; c < state.tableau.length; c++) {
-                    var col = state.tableau[c];
-                    for (var i = 0; i < col.length; i++) {
-                        var card = col[i];
-                        if (!card.faceUp) continue;
-
-                        var foundationTop = state.foundations[card.suit][state.foundations[card.suit].length - 1];
-                        if ((!foundationTop && card.rankIdx === 0) || (foundationTop && card.rankIdx === foundationTop.rankIdx + 1)) {
-                            return true;
-                        }
-
-                        for (var tc = 0; tc < state.tableau.length; tc++) {
-                            if (tc === c) continue;
-                            var targetCol = state.tableau[tc];
-                            var targetTop = targetCol[targetCol.length - 1];
-                            if (!targetTop) {
-                                if (card.rankIdx === 12) return true;
-                                continue;
-                            }
-                            if (!targetTop.faceUp) continue;
-
-                            var targetRed = (targetTop.suit === 'h' || targetTop.suit === 'd');
-                            var cardRed = (card.suit === 'h' || card.suit === 'd');
-                            if (targetRed !== cardRed && targetTop.rankIdx === card.rankIdx + 1) return true;
-                        }
-                    }
-                }
-
-                return false;
-            }
-
             function render() {
                 var stockEl = S_ROOT.querySelector('#stock');
                 stockEl.innerHTML = state.stock.length ? '<div class="solitaire-card back"></div>' : '';
@@ -394,6 +351,7 @@
                 }
 
                 S_ROOT.querySelector('#moves-label').textContent = state.moves + ' moves';
+                S_ROOT.querySelector('#state-label').textContent = hasPlayableMove() ? 'Moves available' : 'No moves left';
             }
 
             S_ROOT.addEventListener('click', function(e) {
@@ -401,11 +359,6 @@
                     closeModal();
                     return;
                 }
-                if (e.target && e.target.id === 'solitaire-modal-new') {
-                    startGame();
-                    return;
-                }
-
                 var target = e.target.closest('.solitaire-card, .solitaire-stock, .solitaire-foundation, .solitaire-column');
                 if (!target) return;
 
@@ -421,7 +374,7 @@
                     state.moves++;
                     state.selected = null;
                     render();
-                    if (!hasValidMoves()) showModal('Draw from stock or start a new game to continue.');
+                    evaluateNoMoves();
                     return;
                 }
 
@@ -429,7 +382,6 @@
                     if (state.waste.length) {
                         state.selected = { type: 'waste' };
                         render();
-                        if (!hasValidMoves()) showModal('Draw from stock or start a new game to continue.');
                     }
                     evaluateNoMoves();
                     return;
@@ -461,7 +413,7 @@
 
                         state.selected = null;
                         render();
-                        if (!hasValidMoves()) showModal('Draw from stock or start a new game to continue.');
+                        evaluateNoMoves();
                     }
                     return;
                 }
@@ -495,7 +447,8 @@
 
                     if (movingCards.length) {
                         var first = movingCards[0];
-                        var valid = canPlaceOnTableau(first, targetTop);
+                        var sameColumnMove = state.selected.type === 'tableau' && state.selected.col === colIdx;
+                        var valid = !sameColumnMove && canPlaceOnTableau(first, targetTop);
 
                         if (valid) {
                             if (state.selected.type === 'waste') {
@@ -510,22 +463,13 @@
                         }
                         state.selected = null;
                         render();
-                        if (!hasValidMoves()) showModal('Draw from stock or start a new game to continue.');
+                        evaluateNoMoves();
+                        return;
                     }
 
                     state.selected = null;
                     render();
                     evaluateNoMoves();
-                }
-
-                if (!hasValidMoves()) {
-                    showModal('Draw from stock or start a new game to continue.');
-                }
-            });
-
-            S_ROOT.addEventListener('click', function(e) {
-                if (e.target && e.target.id === 'solitaire-modal-close') {
-                    closeModal();
                 }
             });
 
