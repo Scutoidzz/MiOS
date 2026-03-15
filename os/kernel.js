@@ -150,10 +150,6 @@ function createWindow(title, content) {
   });
 
   win.querySelector('.close').addEventListener('click', () => win.remove());
-  win.querySelector('.minimize').addEventListener('click', () => {
-    const content = win.querySelector('.content');
-    content.style.display = content.style.display === 'none' ? 'block' : 'none';
-  });
 
   win.addEventListener('mousedown', () => TopZ(win));
 
