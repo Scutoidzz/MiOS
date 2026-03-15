@@ -194,21 +194,6 @@
                 return (!top && card.rankIdx === 0) || (top && card.rankIdx === top.rankIdx + 1);
             }
 
-
-            function isValidTableauRun(cards) {
-                if (!cards.length) return false;
-                for (var i = 0; i < cards.length; i++) {
-                    if (!cards[i].faceUp) return false;
-                }
-                for (var j = 0; j < cards.length - 1; j++) {
-                    var current = cards[j];
-                    var next = cards[j + 1];
-                    if (isRed(current) === isRed(next)) return false;
-                    if (current.rankIdx !== next.rankIdx + 1) return false;
-                }
-                return true;
-            }
-
             function showModal(message) {
                 state.modalMessage = message;
                 render();
@@ -245,9 +230,6 @@
                         var card = col[cardIdx];
                         if (!card.faceUp) continue;
 
-                        var movingRun = col.slice(cardIdx);
-                        if (!isValidTableauRun(movingRun)) continue;
-
                         for (var targetIdx = 0; targetIdx < state.tableau.length; targetIdx++) {
                             if (targetIdx === colIdx) continue;
                             var target = state.tableau[targetIdx];
@@ -261,14 +243,7 @@
             }
 
             function evaluateNoMoves() {
-                var playable = hasPlayableMove();
-                var stateLabel = S_ROOT.querySelector('#state-label');
-                if (stateLabel) {
-                    stateLabel.textContent = playable ? 'Moves available' : 'No valid moves left';
-                    stateLabel.style.color = playable ? 'white' : '#ffeb3b';
-                }
-
-                if (playable) {
+                if (hasPlayableMove()) {
                     if (state.modalMessage) closeModal();
                     return;
                 }
@@ -324,6 +299,52 @@
                 return div;
             }
 
+
+
+            function showModal(message) {
+                state.modalMessage = message;
+                render();
+            }
+
+            function closeModal() {
+                state.modalMessage = '';
+                render();
+            }
+
+            function hasValidMoves() {
+                if (state.stock.length || state.waste.length) return true;
+
+                for (var c = 0; c < state.tableau.length; c++) {
+                    var col = state.tableau[c];
+                    for (var i = 0; i < col.length; i++) {
+                        var card = col[i];
+                        if (!card.faceUp) continue;
+
+                        var foundationTop = state.foundations[card.suit][state.foundations[card.suit].length - 1];
+                        if ((!foundationTop && card.rankIdx === 0) || (foundationTop && card.rankIdx === foundationTop.rankIdx + 1)) {
+                            return true;
+                        }
+
+                        for (var tc = 0; tc < state.tableau.length; tc++) {
+                            if (tc === c) continue;
+                            var targetCol = state.tableau[tc];
+                            var targetTop = targetCol[targetCol.length - 1];
+                            if (!targetTop) {
+                                if (card.rankIdx === 12) return true;
+                                continue;
+                            }
+                            if (!targetTop.faceUp) continue;
+
+                            var targetRed = (targetTop.suit === 'h' || targetTop.suit === 'd');
+                            var cardRed = (card.suit === 'h' || card.suit === 'd');
+                            if (targetRed !== cardRed && targetTop.rankIdx === card.rankIdx + 1) return true;
+                        }
+                    }
+                }
+
+                return false;
+            }
+
             function render() {
                 var stockEl = S_ROOT.querySelector('#stock');
                 stockEl.innerHTML = state.stock.length ? '<div class="solitaire-card back"></div>' : '';
@@ -368,7 +389,7 @@
                 if (state.modalMessage) {
                     var modal = document.createElement('div');
                     modal.className = 'solitaire-modal';
-                    modal.innerHTML = '<div class="solitaire-modal-card"><h3>No valid moves</h3><p>' + state.modalMessage + '</p><div style="display:flex;gap:8px;justify-content:center;"><button type="button" class="solitaire-btn" id="solitaire-modal-close">OK</button><button type="button" class="solitaire-btn" id="solitaire-modal-new">New Game</button></div></div>';
+                    modal.innerHTML = '<div class="solitaire-modal-card"><h3>No valid moves</h3><p>' + state.modalMessage + '</p><button type="button" class="solitaire-btn" id="solitaire-modal-close">OK</button></div>';
                     S_ROOT.appendChild(modal);
                 }
 
@@ -400,7 +421,7 @@
                     state.moves++;
                     state.selected = null;
                     render();
-                    evaluateNoMoves();
+                    if (!hasValidMoves()) showModal('Draw from stock or start a new game to continue.');
                     return;
                 }
 
@@ -408,6 +429,7 @@
                     if (state.waste.length) {
                         state.selected = { type: 'waste' };
                         render();
+                        if (!hasValidMoves()) showModal('Draw from stock or start a new game to continue.');
                     }
                     evaluateNoMoves();
                     return;
@@ -439,7 +461,7 @@
 
                         state.selected = null;
                         render();
-                        evaluateNoMoves();
+                        if (!hasValidMoves()) showModal('Draw from stock or start a new game to continue.');
                     }
                     return;
                 }
@@ -473,7 +495,7 @@
 
                     if (movingCards.length) {
                         var first = movingCards[0];
-                        var valid = isValidTableauRun(movingCards) && canPlaceOnTableau(first, targetTop);
+                        var valid = canPlaceOnTableau(first, targetTop);
 
                         if (valid) {
                             if (state.selected.type === 'waste') {
@@ -486,15 +508,31 @@
                             state.tableau[colIdx].push.apply(state.tableau[colIdx], movingCards);
                             state.moves++;
                         }
+                        state.selected = null;
+                        render();
+                        if (!hasValidMoves()) showModal('Draw from stock or start a new game to continue.');
                     }
 
                     state.selected = null;
                     render();
                     evaluateNoMoves();
                 }
+
+                if (!hasValidMoves()) {
+                    showModal('Draw from stock or start a new game to continue.');
+                }
             });
 
-            S_ROOT.querySelector('#new-game').addEventListener('click', startGame);
+            S_ROOT.addEventListener('click', function(e) {
+                if (e.target && e.target.id === 'solitaire-modal-close') {
+                    closeModal();
+                }
+            });
+
+            S_ROOT.querySelector('#new-game').addEventListener('click', function() {
+                closeModal();
+                startGame();
+            });
             startGame();
         })();
     </script>
