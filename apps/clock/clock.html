@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Clock</title>
+  </head>
+  <body>
+    <div class="clock-section">
+      <h1 id="clock-time">--:-- --</h1>
+      <p id="clock-date">--</p>
+    </div>
+
+    <div class="timer-section">
+      <h3>Timer</h3>
+      <div class="timer-row">
+        <input type="number" id="timer-min" min="0" max="99" value="0" placeholder="0">
+        <span class="timer-sep">:</span>
+        <input type="number" id="timer-sec" min="0" max="59" value="0" placeholder="0">
+        <button type="button" id="timer-btn" class="timer-btn">Start</button>
+      </div>
+    </div>
+
+    <script>
+      (function () {
+        const clockTime = document.getElementById("clock-time");
+        const clockDate = document.getElementById("clock-date");
+        const timerMin = document.getElementById("timer-min");
+        const timerSec = document.getElementById("timer-sec");
+        const timerBtn = document.getElementById("timer-btn");
+
+        function formatTime(date) {
+          const hours = date.getHours();
+          const mins = date.getMinutes();
+          const am = hours < 12;
+          const h = hours % 12 || 12;
+          const m = mins < 10 ? "0" + mins : String(mins);
+          return h + ":" + m + " " + (am ? "AM" : "PM");
+        }
+
+        function formatDate(date) {
+          const months = [
+            "January", "February", "March", "April", "May", "June",
+            "July", "August", "September", "October", "November", "December"
+          ];
+          const d = date.getDate();
+          const suffix = d === 1 || d === 21 || d === 31 ? "st"
+            : d === 2 || d === 22 ? "nd"
+            : d === 3 || d === 23 ? "rd"
+            : "th";
+          return months[date.getMonth()] + " " + d + suffix + ", " + date.getFullYear();
+        }
+
+        function updateClock() {
+          const now = new Date();
+          if (clockTime) clockTime.textContent = formatTime(now);
+          if (clockDate) clockDate.textContent = formatDate(now);
+        }
+
+        updateClock();
+        setInterval(updateClock, 1000);
+
+        // Timer
+        let timerId = null;
+        let timerEnd = null;
+
+        function clampTimerInputs() {
+          let m = parseInt(timerMin.value, 10) || 0;
+          let s = parseInt(timerSec.value, 10) || 0;
+          if (m < 0) m = 0;
+          if (m > 99) m = 99;
+          if (s < 0) s = 0;
+          if (s > 59) s = 59;
+          timerMin.value = m;
+          timerSec.value = s;
+        }
+
+        function tickTimer() {
+          const left = Math.max(0, Math.ceil((timerEnd - Date.now()) / 1000));
+          if (left <= 0) {
+            stopTimer();
+            if (typeof alert === "function") alert("Timer finished!");
+            return;
+          }
+          const m = Math.floor(left / 60);
+          const s = left % 60;
+          timerMin.value = m;
+          timerSec.value = s;
+        }
+
+        function startTimer() {
+          clampTimerInputs();
+          const m = parseInt(timerMin.value, 10) || 0;
+          const s = parseInt(timerSec.value, 10) || 0;
+          if (m === 0 && s === 0) return;
+          timerEnd = Date.now() + (m * 60 + s) * 1000;
+          timerMin.disabled = true;
+          timerSec.disabled = true;
+          timerBtn.textContent = "Stop";
+          timerBtn.classList.add("stop");
+          timerId = setInterval(tickTimer, 200);
+          tickTimer();
+        }
+
+        function stopTimer() {
+          if (timerId) clearInterval(timerId);
+          timerId = null;
+          timerEnd = null;
+          timerMin.disabled = false;
+          timerSec.disabled = false;
+          timerBtn.textContent = "Start";
+          timerBtn.classList.remove("stop");
+        }
+
+        if (timerBtn) {
+          timerBtn.addEventListener("click", function () {
+            if (timerId) stopTimer();
+            else startTimer();
+          });
+        }
+
+        timerMin.addEventListener("change", clampTimerInputs);
+        timerSec.addEventListener("change", clampTimerInputs);
+      })();
+    </script>
+  </body>
+</html>

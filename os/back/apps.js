@@ -3,7 +3,10 @@
   const apps = await response.json();
   const dock = document.getElementById("dock");
 
-  apps.forEach(app => {
+  // Only show apps that are not explicitly disabled AND exclude appmanager
+  apps
+    .filter(app => app.enabled !== false && !app.path.includes('appmanager.json'))
+    .forEach(app => {
     const appElement = document.createElement('div');
     appElement.className = 'dock-item';
     appElement.innerHTML = `<img src="${app.icon}" style="width:40px; height:40px; border-radius:8px;">`;    appElement.style.cssText = `

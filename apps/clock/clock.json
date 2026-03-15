@@ -1,0 +1,10 @@
+{
+  "manifest": {
+    "name": "Clock",
+    "icon": "/apps/example.png",
+    "version": "1.0"
+  },
+  "files": {
+    "index.html": "/apps/clock/clock.html"
+  }
+}

@@ -1,0 +1,101 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Notes</title>
+  </head>
+  <body>
+    <div class="notes-root">
+      <div class="notes-toolbar" role="toolbar" aria-label="Notes toolbar">
+        <button id="btnLoad" type="button">Load</button>
+        <button id="btnSaveAs" type="button">Save As</button>
+        <button id="btnClear" type="button">Clear</button>
+        <div class="spacer"></div>
+        <div class="notes-meta" id="activeName">Untitled</div>
+      </div>
+
+      <textarea
+        id="editor"
+        class="notes-editor"
+        placeholder="Type your note…"
+        spellcheck="true"
+      ></textarea>
+    </div>
+
+    <script>
+      const editor = document.getElementById("editor");
+      const activeNameEl = document.getElementById("activeName");
+
+      const btnLoad = document.getElementById("btnLoad");
+      const btnSaveAs = document.getElementById("btnSaveAs");
+      const btnClear = document.getElementById("btnClear");
+
+      function setActiveName(name) {
+        activeNameEl.textContent = name || "Untitled";
+      }
+
+      function normalizeFilename(name) {
+        const raw = String(name || "").trim();
+        if (!raw) return "Untitled.txt";
+        const safe = raw.replaceAll(/[\\/:*?"<>|]/g, "_");
+        return safe.toLowerCase().endsWith(".txt") ? safe : safe + ".txt";
+      }
+
+      function downloadTextFile(filename, text) {
+        const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+      }
+
+      function pickTextFile() {
+        return new Promise((resolve) => {
+          const input = document.createElement("input");
+          input.type = "file";
+          input.accept = ".txt,text/plain";
+          input.addEventListener("change", () => resolve(input.files && input.files[0] ? input.files[0] : null));
+          input.click();
+        });
+      }
+
+      async function loadFromFile() {
+        const file = await pickTextFile();
+        if (!file) return;
+        const text = await file.text();
+        editor.value = text;
+        const base = (file.name || "Untitled").replace(/\.txt$/i, "");
+        setActiveName(base || "Untitled");
+      }
+
+      function saveAsFile() {
+        const current = activeNameEl.textContent || "Untitled";
+        const name = prompt("Save as (.txt)…", current === "Untitled" ? "" : current);
+        if (name == null) return;
+        const filename = normalizeFilename(name);
+        downloadTextFile(filename, editor.value || "");
+        setActiveName(filename.replace(/\.txt$/i, ""));
+      }
+
+      setActiveName("Untitled");
+
+      btnSaveAs.addEventListener("click", () => {
+        saveAsFile();
+      });
+
+      btnLoad.addEventListener("click", () => {
+        loadFromFile().catch(() => alert("Could not load that file."));
+      });
+
+      btnClear.addEventListener("click", () => {
+        if (!confirm("Clear the editor?")) return;
+        editor.value = "";
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<head>
+    <title>Piri</title>
+    <link rel="stylesheet" href="../../os/defaultstyle.css">
+    <style>
+        .piri-container {
+            text-align: center;
+            padding: 20px;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+        .piri-button {
+            padding: 10px 20px;
+            margin: 10px;
+            cursor: pointer;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            background: #f0f0f0;
+        }
+        .piri-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .piri-status {
+            margin: 15px 0;
+            font-weight: bold;
+        }
+        #piri-result {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            min-height: 50px;
+            white-space: pre-wrap;
+            text-align: left;
+            border: 1px solid #eee;
+        }
+        .error { color: #d00; }
+        .listening { color: #0a0; }
+    </style>
+</head>
+<body>
+    <div class="piri-container">
+        <h1>Piri</h1>
+        <div id="status" class="piri-status">Status: Waiting for module...</div>
+        <button id="listenBtn" class="piri-button" disabled>Start Listening</button>
+        <button id="stopBtn" class="piri-button" disabled>Stop Listening</button>
+        <div id="piri-result">Voice results will appear here...</div>
+    </div>
+
+    <script src="/apps/Piri/voiceorb.js"></script>
+    <script>
+        (function() {
+            const listenBtn = document.getElementById('listenBtn');
+            const stopBtn = document.getElementById('stopBtn');
+            const resultDiv = document.getElementById('piri-result');
+            const statusDiv = document.getElementById('status');
+
+            let attempts = 0;
+            const maxAttempts = 20; // Wait up to 2 seconds
+
+            function init() {
+                if (typeof VoiceOrb !== 'undefined') {
+                    const voiceOrb = new VoiceOrb();
+
+                    if (!voiceOrb.isSupported()) {
+                        statusDiv.textContent = 'Status: API not supported';
+                        statusDiv.className = 'piri-status error';
+                        return;
+                    }
+
+                    statusDiv.textContent = 'Status: Ready';
+                    listenBtn.disabled = false;
+
+                    listenBtn.onclick = async () => {
+                        try {
+                            statusDiv.textContent = 'Status: Listening...';
+                            statusDiv.className = 'piri-status listening';
+                            listenBtn.disabled = true;
+                            stopBtn.disabled = false;
+                            resultDiv.textContent = 'Speak now...';
+
+                            const result = await voiceOrb.listen();
+                            
+                            if (result.ok) {
+                                resultDiv.textContent = JSON.stringify(result, null, 2);
+                                statusDiv.textContent = 'Status: Done';
+                            } else {
+                                resultDiv.textContent = result.error || 'No speech detected';
+                                statusDiv.textContent = 'Status: Idle';
+                            }
+                            statusDiv.className = 'piri-status idle';
+                        } catch (error) {
+                            resultDiv.textContent = `Error: ${error.message || error}`;
+                            console.error('Piri Error:', error);
+                            statusDiv.textContent = 'Status: Error';
+                            statusDiv.className = 'piri-status error';
+                        } finally {
+                            listenBtn.disabled = false;
+                            stopBtn.disabled = true;
+                        }
+                    };
+
+                    stopBtn.onclick = () => {
+                        voiceOrb.stop();
+                        statusDiv.textContent = 'Status: Stopped';
+                        statusDiv.className = 'piri-status idle';
+                        listenBtn.disabled = false;
+                        stopBtn.disabled = true;
+                    };
+                } else if (attempts < maxAttempts) {
+                    attempts++;
+                    setTimeout(init, 100);
+                } else {
+                    statusDiv.textContent = 'Status: Error loading module';
+                    statusDiv.className = 'piri-status error';
+                }
+            }
+
+            init();
+        })();
+    </script>
+</body>
+</html>

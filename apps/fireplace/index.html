@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+    <head>
+
+    </head>
+    <body>
+       <h1 id="dynamic">Tha Roasting Machine</h1> 
+       <br>
+       <button id="roastme" onclick="update_roast()">Givuh me da roast</button>
+       <script>
+        const roastbutton = document.getElementById("roastme");
+        // The real skill issue is you'll press the button over and over and expect it to roast you
+        roasts = ["your head is shaped like the VS Code logo.", "As soon as you touched the computer it overheated and died", "you're so chopped your computer kernel panicked when you took a selfie"];
+        roasterdisplay = document.getElementById("dynamic");
+        function getRandomFloat(min, max) {
+        return Math.random() * (max - min) + min;
+        }
+
+        function update_roast() {
+            currentroastnum = getRandomFloat(0, 2);
+            currentroast = list[currentroastnum];
+            roasterdisplay.innerHTML = '<h1>$currentroast</h1';
+        }
+       </script>
+    </body>
+</html>

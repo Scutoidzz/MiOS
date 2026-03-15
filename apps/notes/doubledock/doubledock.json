@@ -1,0 +1,10 @@
+{
+  "manifest": {
+    "name": "DoubleDock",
+    "icon": "_d",
+    "version": "0.1"
+  },
+  "files": {
+    "index.html": "/apps/doubledock/dock.html"
+  }
+}

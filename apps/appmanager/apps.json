@@ -1,5 +1,8 @@
 [
-  { "icon": "/apps/example.png", "path": "/apps/example.json" },
-  { "icon": "/apps/appmanager/icon.png", "path": "/apps/appmanager/appmanager.json"},
-  { "icon": "/apps/settings/icon.png", "path": "/apps/settings/settings.json"}
+  { "icon": "/apps/example.png", "path": "/apps/example.json", "enabled": true },
+  { "icon": "/apps/appmanager/icon.png", "path": "/apps/appmanager/appmanager.json", "enabled": true },
+  { "icon": "/apps/clock/clock.png", "path": "/apps/clock/clock.json", "enabled": true },
+  { "icon": "/apps/solitaire/icon.png", "path": "/apps/solitaire/solitaire.json", "enabled": true },
+  { "icon": "/apps/settings/icon.png", "path": "/apps/settings/settings.json", "enabled": true },
+  { "icon": "/apps/notes/icon.png", "path": "/apps/notes/notes.json", "enabled": true }
 ]

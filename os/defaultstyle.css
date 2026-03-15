@@ -4,32 +4,447 @@
          box-sizing: border-box; 
         }
         
+   :root {
+       /* light theme defaults */
+       --body-bg-color: #201f1f;
+       --window-bg: #ffffff;
+       --window-text: #111827;
+       --titlebar-bg: #e5e7eb;
+       --titlebar-color: #111827;
+       --dock-bg: rgba(255, 255, 255, 0.832);
+
+       /* app-level defaults */
+       --app-surface: #f9fafb;
+       --app-surface-soft: #f3f4f6;
+       --app-border: rgba(15, 23, 42, 0.1);
+       --app-text: #111827;
+       --app-text-muted: #6b7280;
+       --app-accent: #3a3c3f;
+       --app-accent-soft: rgba(15, 23, 42, 0.06);
+       --app-button-bg: #111827;
+       --app-button-bg-hover: #020617;
+       --app-button-text: #f9fafb;
+   }
+
     body { 
         background-image: url(../setup/wallpaper.jpeg);
+        background-color: var(--body-bg-color);
         height: 100vh; 
-        overflow: hidden; 
+        overflow: hidden;
+        transition:
+            background-color 0.4s ease,
+            filter 0.4s ease;
     }
-    
-    #dock {
+
+    #topbar {
         position: fixed;
-        bottom: 20px;
-        left: 50%;
-        transform: translateX(-50%);
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 38px;
         display: flex;
-        gap: 15px;
-        background: rgba(0, 0, 0, 0.5);
-        padding: 10px 20px;
-        border-radius: 25px;
+        align-items: center;
+        justify-content: flex-end;
+        padding: 0 12px;
+        gap: 10px;
+        color: rgba(255, 255, 255, 0.92);
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        font-size: 13px;
+        letter-spacing: 0.2px;
+        background: rgba(15, 15, 15, 0.35);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        z-index: 99999;
+        user-select: none;
+        pointer-events: none;
+    }
+
+    #topbar .topbar-time {
+        font-variant-numeric: tabular-nums;
+    }
+
+   body.dark-theme {
+       --body-bg-color: #000000;
+       --window-bg: #151515;
+       --window-text: #e5e7eb;
+       --titlebar-bg: #1b1b1b;
+       --titlebar-color: #e5e7eb;
+       --dock-bg: rgba(67, 66, 66, 0.9);
+
+       --app-surface: #181818;
+       --app-surface-soft: #202020;
+       --app-border: rgba(80, 80, 80, 0.6);
+       --app-text: #e5e7eb;
+       --app-text-muted: #9ca3af;
+       --app-accent: #262626;
+       --app-accent-soft: rgba(80, 80, 80, 0.35);
+       --app-button-bg: #202020;
+       --app-button-bg-hover: #151515;
+       --app-button-text: #e5e7eb;
+   }
+    
+   #dock {
+       position: fixed;
+       bottom: 9px;
+       left: 50%;
+       transform: translateX(-50%);
+       display: flex;
+       gap: 15px;
+       background: var(--dock-bg);
+       padding: 10px 20px;
+       border-radius: 23px;
+       transition: background-color 0.4s ease;
+   }
+
+    .window {
+        background: var(--window-bg, white);
+        color: var(--window-text, #111827);
+        transition: background-color 0.4s ease, color 0.4s ease, border-color 0.4s ease;
+        border: 1px solid var(--app-border, rgba(15, 23, 42, 0.12));
+    }
+
+    .window .content {
+        color: var(--app-text, inherit);
+    }
+
+    .window .titlebar {
+        transition: background-color 0.4s ease, color 0.4s ease;
     }
     
-    .dock-item {
-        cursor: pointer;
-        color: white;
-        font-size: 24px;
-        padding: 5px 10px;
-        transition: transform 0.2s;
-    }
-    
-    .dock-item:hover {
-        transform: scale(1.2);
-    }
+   .dock-item {
+       cursor: pointer;
+       color: white;
+       font-size: 24px;
+       padding: 5px 10px;
+       background-color: rgb(101, 101, 105);
+       border-radius: 23px;
+   }
+
+   .window .content {
+       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+       color: var(--app-text, #111827);
+   }
+
+   .window .content .clock-section {
+       text-align: center;
+       margin-bottom: 24px;
+   }
+
+   .window .content #clock-time {
+       font-size: 2.5rem;
+       font-variant-numeric: tabular-nums;
+       margin: 0 0 4px 0;
+       letter-spacing: 0.02em;
+   }
+
+   .window .content #clock-date {
+       font-size: 1rem;
+       margin: 0;
+       color: var(--app-text-muted, #6b7280);
+   }
+
+   .window .content .timer-section {
+       padding: 16px;
+       border-radius: 8px;
+       background: var(--app-surface-soft, rgba(15, 23, 42, 0.04));
+       border: 1px solid var(--app-border, rgba(15, 23, 42, 0.12));
+   }
+
+   .window .content .timer-section h3 {
+       font-size: 14px;
+       margin: 0 0 12px 0;
+       color: var(--app-text-muted, #6b7280);
+   }
+
+   .window .content .timer-row {
+       display: flex;
+       align-items: center;
+       gap: 8px;
+       flex-wrap: wrap;
+   }
+
+   .window .content .timer-row input {
+       width: 64px;
+       padding: 8px 10px;
+       font-size: 1rem;
+       font-variant-numeric: tabular-nums;
+       border: 1px solid var(--app-border, rgba(15, 23, 42, 0.12));
+       border-radius: 6px;
+       background: var(--window-bg, #fff);
+       color: var(--app-text, #111827);
+   }
+
+   .window .content .timer-row input:focus {
+       outline: none;
+       border-color: var(--app-accent, #3a3c3f);
+   }
+
+   .window .content .timer-row input:disabled {
+       opacity: 0.7;
+       cursor: not-allowed;
+   }
+
+   .window .content .timer-sep {
+       font-size: 1.25rem;
+       font-weight: 600;
+       color: var(--app-text-muted, #6b7280);
+   }
+
+   .window .content .timer-btn {
+       padding: 8px 16px;
+       font-size: 14px;
+       font-weight: 500;
+       border: none;
+       border-radius: 6px;
+       cursor: pointer;
+       background: var(--app-button-bg, #111827);
+       color: var(--app-button-text, #f9fafb);
+       transition: background 0.15s ease;
+   }
+
+   .window .content .timer-btn:hover:not(:disabled) {
+       background: var(--app-button-bg-hover, #020617);
+   }
+
+   .window .content .timer-btn:disabled {
+       opacity: 0.6;
+       cursor: not-allowed;
+   }
+
+   .window .content .timer-btn.stop {
+       background: #991b1b;
+   }
+
+   .window .content .timer-btn.stop:hover:not(:disabled) {
+       background: #7f1d1d;
+   }
+
+   /* Settings app */
+   .window .content h1 {
+       font-size: 20px;
+       margin-bottom: 12px;
+   }
+
+   .window .content #cards {
+       display: flex;
+       gap: 12px;
+       flex-wrap: wrap;
+   }
+
+   .window .content .card {
+       flex: 0 0 140px;
+       padding: 12px;
+       border-radius: 4px;
+       background: var(--app-surface-soft, rgba(15, 23, 42, 0.04));
+       border: 1px solid var(--app-border, rgba(15, 23, 42, 0.12));
+       cursor: pointer;
+       transition:
+           background-color 0.15s ease,
+           border-color 0.15s ease;
+       text-align: left;
+   }
+
+   .window .content .card:hover {
+       background: var(--app-surface, #f9fafb);
+       border-color: var(--app-border, rgba(15, 23, 42, 0.18));
+   }
+
+   .window .content .card h2 {
+       font-size: 14px;
+       margin: 0 0 4px 0;
+   }
+
+   .window .content .card p {
+       font-size: 11px;
+       margin: 0;
+       color: var(--app-text-muted, #6b7280);
+   }
+
+   /* Notes app */
+   .window .content .notes-root {
+       width: 100%;
+       max-width: 520px;
+   }
+
+   .window .content .notes-toolbar {
+       display: flex;
+       align-items: center;
+       gap: 8px;
+       flex-wrap: wrap;
+   }
+
+   .window .content .notes-toolbar button {
+       appearance: none;
+       border: 1px solid rgba(255, 255, 255, 0.12);
+       background: var(--app-button-bg, #555);
+       color: var(--app-button-text, #fff);
+       border-radius: 10px;
+       padding: 8px 10px;
+       font-size: 12px;
+       cursor: pointer;
+       user-select: none;
+       white-space: nowrap;
+   }
+
+   .window .content .notes-toolbar button:hover {
+       background: var(--app-button-bg-hover, #666);
+   }
+
+   .window .content .notes-toolbar button:active {
+       transform: translateY(1px);
+   }
+
+   .window .content .notes-toolbar .spacer {
+       flex: 1;
+   }
+
+   .window .content .notes-meta {
+       font-size: 12px;
+       color: var(--app-text-muted, rgba(255, 255, 255, 0.85));
+       padding-right: 4px;
+   }
+
+   .window .content .notes-editor {
+       margin-top: 10px;
+       width: 100%;
+       min-height: 220px;
+       resize: vertical;
+       padding: 12px;
+       border-radius: 12px;
+       border: 1px solid var(--app-border, rgba(0, 0, 0, 0.18));
+       outline: none;
+       font-family: inherit;
+       font-size: 13px;
+       line-height: 1.45;
+       background: var(--window-bg, #fff);
+       color: var(--app-text, #111);
+   }
+
+   .window .content .notes-editor:focus {
+       border-color: rgba(80, 160, 255, 0.55);
+       box-shadow: 0 0 0 3px rgba(80, 160, 255, 0.55);
+   }
+
+   .window .content .notes-modal-backdrop {
+       position: fixed;
+       inset: 0;
+       background: rgba(0, 0, 0, 0.35);
+       display: none;
+       align-items: center;
+       justify-content: center;
+       padding: 14px;
+       z-index: 999999;
+   }
+
+   .window .content .notes-modal {
+       width: min(520px, 100%);
+       background: var(--window-bg, #fff);
+       border-radius: 14px;
+       border: 1px solid var(--app-border, rgba(0, 0, 0, 0.12));
+       overflow: hidden;
+       font-family: inherit;
+   }
+
+   .window .content .notes-modal-header {
+       display: flex;
+       align-items: center;
+       gap: 10px;
+       padding: 10px 12px;
+       background: var(--app-button-bg, #333);
+       color: var(--app-button-text, #fff);
+   }
+
+   .window .content .notes-modal-header .title {
+       font-size: 13px;
+       font-weight: 600;
+   }
+
+   .window .content .notes-modal-header .close {
+       margin-left: auto;
+       width: 26px;
+       height: 26px;
+       border-radius: 8px;
+       border: 1px solid rgba(255, 255, 255, 0.15);
+       background: #555;
+       color: #fff;
+       cursor: pointer;
+   }
+
+   .window .content .notes-modal-body {
+       padding: 10px 12px;
+       max-height: 320px;
+       overflow: auto;
+   }
+
+   /* Appmanager app */
+   .window .content #sources {
+       border-radius: 4px;
+       padding: 12px 14px;
+       background: var(--app-surface-soft, #f3f4f6);
+       border: 1px solid var(--app-border, rgba(15, 23, 42, 0.12));
+   }
+
+   .window .content #sources h1 {
+       font-size: 18px;
+       margin: 0 0 10px 0;
+   }
+
+   .window .content #sources button {
+       width: 180px;
+       height: 38px;
+       margin: 4px 0;
+       border-radius: 4px;
+       border: 1px solid var(--app-border, rgba(15, 23, 42, 0.12));
+       background-color: var(--app-button-bg, #111827);
+       color: var(--app-button-text, #f9fafb);
+       cursor: pointer;
+       font-size: 13px;
+       transition:
+           background-color 0.15s ease,
+           border-color 0.15s ease;
+   }
+
+   .window .content #sources button:hover {
+       background-color: var(--app-button-bg-hover, #020617);
+       border-color: var(--app-border, rgba(15, 23, 42, 0.18));
+   }
+
+   .window .content #apps {
+       margin-top: 12px;
+   }
+
+   /* Solitaire app */
+   .window .content .solitaire-game {
+       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+       padding: 8px;
+       min-width: 320px;
+   }
+
+   .window .content .solitaire-top {
+       display: flex;
+       gap: 10px;
+       align-items: flex-start;
+       margin-bottom: 16px;
+   }
+
+   .window .content .solitaire-stock,
+   .window .content .solitaire-waste {
+       width: 72px;
+       min-height: 96px;
+       border-radius: 6px;
+       border: 1px solid var(--app-border, rgba(15, 23, 42, 0.12));
+       background: var(--app-surface-soft, #e8e8e8);
+       position: relative;
+       cursor: pointer;
+   }
+
+   .window .content .solitaire-waste {
+       display: flex;
+       gap: 0;
+       padding-left: 0;
+   }
+
+   .window .content .solitaire-waste .solitaire-card {
+       margin-left: -52px;
+   }

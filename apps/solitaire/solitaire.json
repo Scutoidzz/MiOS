@@ -1,0 +1,10 @@
+{
+  "manifest": {
+    "name": "Solitaire",
+    "icon": "/apps/example.png",
+    "version": "1.0"
+  },
+  "files": {
+    "index.html": "/apps/solitaire/solitaire.html"
+  }
+}
