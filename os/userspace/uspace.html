@@ -1,16 +1,59 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
   <link rel="stylesheet" href="../defaultstyle.css">
 </head>
 <body>
+  <audio id="bgMusic" autoplay>
+    <source src="../../boot.mp3" type="audio/mpeg">
+  </audio>
+
   <script src="../kernel.js"></script>
   <script src="../back/apps.js" async></script>
-  <script>
-    createWindow("Tuff music", '<iframe width="299" height="100" src="https://www.youtube-nocookie.com/embed/jvR2QzD2HLw?si=rkeGfN4jDu_yCP9h" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>')
-  </script>
-  <div id="dock">
-    
+
+  <div id="topbar" aria-hidden="true">
+    <span class="topbar-date" id="topbar-date"></span>
+    <span class="topbar-time" id="topbar-time"></span>
   </div>
+
+  <script>
+    // Music autoplay fallback
+    window.addEventListener('load', () => {
+      const audio = document.getElementById('bgMusic');
+      if (audio) audio.play().catch(err => console.log("Autoplay blocked:", err));
+    });
+
+    // Clock
+    (function () {
+      const dateEl = document.getElementById("topbar-date");
+      const timeEl = document.getElementById("topbar-time");
+      if (!dateEl || !timeEl) return;
+
+      const update = () => {
+        const d = new Date();
+        const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+        const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        const pad = (n) => String(n).padStart(2, "0");
+
+        dateEl.textContent = `${days[d.getDay()]} ${months[d.getMonth()]} ${d.getDate()}`;
+        timeEl.textContent = `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+      };
+
+      update();
+      setInterval(update, 1000);
+    })();
+
+    // Initial window (without the web-share attribute that causes warnings)
+    window.addEventListener('DOMContentLoaded', () => {
+      setTimeout(() => {
+        if (typeof createWindow === 'function') {
+          createWindow("Tuff music", '<iframe width="299" height="100" src="https://www.youtube-nocookie.com/embed/jvR2QzD2HLw?si=rkeGfN4jDu_yCP9h" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; encrypted-media" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>');
+        }
+      }, 500);
+    });
+  </script>
+
+  <div id="dock"></div>
 </body>
 </html>
