@@ -1,10 +1,10 @@
 {
   "manifest": {
     "name": "Notes",
-    "icon": "|n",
+    "icon": "apps/notes/icon.png",
     "version": "0.1"
   },
   "files": {
-    "index.html": "/apps/notes/notes.html"
+    "index.html": "apps/notes/notes.html"
   }
 }

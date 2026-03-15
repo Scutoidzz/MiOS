@@ -1,11 +1,11 @@
 {
   "manifest": {
     "name": "Piri Voice Orb",
-    "icon": "/apps/Piri/icon.png",
+    "icon": "apps/Piri/icon.png",
     "version": "1.0.0"
   },
   "files": {
-    "index.html": "/apps/Piri/index.html",
-    "voiceorb.js": "/apps/Piri/voiceorb.js"
+    "index.html": "apps/Piri/index.html",
+    "voiceorb.js": "apps/Piri/voiceorb.js"
   }
 }

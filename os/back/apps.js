@@ -1,5 +1,6 @@
 (async () => {
-  const response = await fetch('/apps/appmanager/apps.json');
+  // Use relative path for subfolder hosting (GitHub Pages)
+  const response = await fetch('apps/appmanager/apps.json');
   const apps = await response.json();
   const dock = document.getElementById("dock");
 
@@ -21,7 +22,9 @@
       fetch(app.path)
         .then(r => r.json())
         .then(appData => {
-          fetch(appData.files['index.html'])
+          // Resolve relative to repo root
+          const indexPath = appData.files['index.html'];
+          fetch(indexPath)
             .then(r => r.text())
             .then(html => createWindow(appData.manifest.name, html))
             .catch(() => alert('Failed to load app HTML'));
