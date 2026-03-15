@@ -1,5 +1,5 @@
 # MiOS
-### Trashy WebOS written ih vanilla HTML
+### Trashy WebOS written in vanilla HTML
 
 ### TroubleShooting / Skill issue
 + if you are preposurous enough to press maximize, you will have to press the title buttons through the menu bar or drag through it
