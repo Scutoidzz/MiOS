@@ -1,12 +1,125 @@
 <!DOCTYPE html>
+<html lang="en">
 <head>
-    </head>
-    <body>
-        <h1>Settings</h1>
-        <div id="cards">
-            <div id="about">
-                <h1>About</h1>
-            </div>
-        </div>
-    </body>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Settings</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f4f4f7;
+      color: #1e1e1e;
+    }
+
+    .settings {
+      display: grid;
+      gap: 10px;
+    }
+
+    .card {
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 12px;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+    }
+
+    .row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 8px;
+      gap: 10px;
+    }
+
+    button {
+      border: 1px solid #bbb;
+      border-radius: 6px;
+      background: #fafafa;
+      padding: 6px 10px;
+      cursor: pointer;
+    }
+
+    .muted {
+      color: #666;
+      font-size: 12px;
+      margin: 4px 0 0;
+    }
+  </style>
+</head>
+<body>
+  <main class="settings">
+    <section class="card">
+      <h2>Appearance</h2>
+      <div class="row">
+        <label for="theme-select">Theme</label>
+        <select id="theme-select">
+          <option value="light">Light</option>
+          <option value="dark">Dark</option>
+        </select>
+      </div>
+      <p class="muted">Changes apply instantly to the desktop window colors.</p>
+    </section>
+
+    <section class="card">
+      <h2>Sound</h2>
+      <div class="row">
+        <span>Boot Music</span>
+        <button id="toggle-music" type="button">Pause</button>
+      </div>
+      <p class="muted" id="music-status">Background music is currently playing.</p>
+    </section>
+
+    <section class="card">
+      <h2>About MiOS</h2>
+      <p class="muted">MiOS is a browser-based desktop experiment with draggable windows and mini apps.</p>
+    </section>
+  </main>
+
+  <script>
+    (function () {
+      var root = window.parent && window.parent.document ? window.parent.document.documentElement : document.documentElement;
+      var themeSelect = document.getElementById('theme-select');
+      var toggleMusic = document.getElementById('toggle-music');
+      var musicStatus = document.getElementById('music-status');
+
+      function setTheme(theme) {
+        if (theme === 'dark') {
+          root.style.setProperty('--window-bg', '#1f2023');
+          root.style.setProperty('--titlebar-bg', '#34363b');
+          root.style.setProperty('--titlebar-color', '#f5f5f5');
+        } else {
+          root.style.setProperty('--window-bg', '#ffffff');
+          root.style.setProperty('--titlebar-bg', '#ccc2c2');
+          root.style.setProperty('--titlebar-color', '#ffffff');
+        }
+      }
+
+      themeSelect.addEventListener('change', function () {
+        setTheme(themeSelect.value);
+      });
+
+      toggleMusic.addEventListener('click', function () {
+        var audio = window.parent && window.parent.document ? window.parent.document.getElementById('bgMusic') : null;
+        if (!audio) {
+          musicStatus.textContent = 'Music control is unavailable in this context.';
+          return;
+        }
+
+        if (audio.paused) {
+          audio.play();
+          toggleMusic.textContent = 'Pause';
+          musicStatus.textContent = 'Background music is currently playing.';
+        } else {
+          audio.pause();
+          toggleMusic.textContent = 'Play';
+          musicStatus.textContent = 'Background music is currently paused.';
+        }
+      });
+
+      setTheme(themeSelect.value);
+    })();
+  </script>
+</body>
 </html>
