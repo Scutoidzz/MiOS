@@ -32,11 +32,7 @@ function createWindow(title, content) {
         color: white; cursor: pointer; font-size: 11px;
       ">X</button>
       <span style="flex: 1; text-align: center; font-size: 13px;">${title}</span>
-      <button class="minimize" style="
-        width: 20px; height: 20px; border-radius: 20%;
-        border: none; background: #555;
-        color: white; cursor: pointer; font-size: 11px;
-      ">_</button>
+     
       <button class="maximize" style="
         width: 20px; height: 20px; border-radius: 20%;
         border: none; background: #555;
