@@ -4,6 +4,4 @@
   { "icon": "apps/clock/clock.png", "path": "apps/clock/clock.json", "enabled": true },
   { "icon": "apps/solitaire/icon.png", "path": "apps/solitaire/solitaire.json", "enabled": true },
   { "icon": "apps/settings/icon.png", "path": "apps/settings/settings.json", "enabled": true },
-  { "icon": "apps/notes/icon.png", "path": "apps/notes/notes.json", "enabled": true },
-  { "icon": "apps/Piri/icon.png", "path": "apps/Piri/manifest.json", "enabled": true }
-]
+  { "icon": "apps/notes/icon.png", "path": "apps/notes/notes.json", "enabled": true }]
