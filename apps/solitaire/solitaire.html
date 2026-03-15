@@ -111,6 +111,37 @@
             cursor: pointer;
             font-weight: 600;
         }
+
+
+        .solitaire-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.45);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 300;
+        }
+
+        .solitaire-modal-card {
+            background: white;
+            color: #1b1b1b;
+            border-radius: 8px;
+            padding: 16px;
+            width: min(280px, 90%);
+            box-shadow: 0 10px 28px rgba(0,0,0,0.35);
+            text-align: center;
+        }
+
+        .solitaire-modal-card h3 {
+            margin: 0 0 8px;
+            font-size: 18px;
+        }
+
+        .solitaire-modal-card p {
+            margin: 0 0 14px;
+            font-size: 14px;
+        }
     </style>
 </head>
 <body>
@@ -145,7 +176,8 @@
                 foundations: { s: [], h: [], d: [], c: [] },
                 tableau: [[], [], [], [], [], [], []],
                 selected: null,
-                moves: 0
+                moves: 0,
+                modalMessage: ''
             };
 
             function startGame() {
@@ -193,6 +225,52 @@
                 return div;
             }
 
+
+
+            function showModal(message) {
+                state.modalMessage = message;
+                render();
+            }
+
+            function closeModal() {
+                state.modalMessage = '';
+                render();
+            }
+
+            function hasValidMoves() {
+                if (state.stock.length || state.waste.length) return true;
+
+                for (var c = 0; c < state.tableau.length; c++) {
+                    var col = state.tableau[c];
+                    for (var i = 0; i < col.length; i++) {
+                        var card = col[i];
+                        if (!card.faceUp) continue;
+
+                        var foundationTop = state.foundations[card.suit][state.foundations[card.suit].length - 1];
+                        if ((!foundationTop && card.rankIdx === 0) || (foundationTop && card.rankIdx === foundationTop.rankIdx + 1)) {
+                            return true;
+                        }
+
+                        for (var tc = 0; tc < state.tableau.length; tc++) {
+                            if (tc === c) continue;
+                            var targetCol = state.tableau[tc];
+                            var targetTop = targetCol[targetCol.length - 1];
+                            if (!targetTop) {
+                                if (card.rankIdx === 12) return true;
+                                continue;
+                            }
+                            if (!targetTop.faceUp) continue;
+
+                            var targetRed = (targetTop.suit === 'h' || targetTop.suit === 'd');
+                            var cardRed = (card.suit === 'h' || card.suit === 'd');
+                            if (targetRed !== cardRed && targetTop.rankIdx === card.rankIdx + 1) return true;
+                        }
+                    }
+                }
+
+                return false;
+            }
+
             function render() {
                 // Stock
                 var stockEl = S_ROOT.querySelector('#stock');
@@ -234,6 +312,16 @@
                     tableauEl.appendChild(colDiv);
                 });
 
+                var existingModal = S_ROOT.querySelector('.solitaire-modal');
+                if (existingModal) existingModal.remove();
+
+                if (state.modalMessage) {
+                    var modal = document.createElement('div');
+                    modal.className = 'solitaire-modal';
+                    modal.innerHTML = '<div class="solitaire-modal-card"><h3>No valid moves</h3><p>' + state.modalMessage + '</p><button type="button" class="solitaire-btn" id="solitaire-modal-close">OK</button></div>';
+                    S_ROOT.appendChild(modal);
+                }
+
                 S_ROOT.querySelector('#moves-label').textContent = state.moves + ' moves';
             }
 
@@ -254,6 +342,7 @@
                     state.moves++;
                     state.selected = null;
                     render();
+                    if (!hasValidMoves()) showModal('Draw from stock or start a new game to continue.');
                     return;
                 }
 
@@ -262,6 +351,7 @@
                     if (state.waste.length) {
                         state.selected = { type: 'waste' };
                         render();
+                        if (!hasValidMoves()) showModal('Draw from stock or start a new game to continue.');
                     }
                     return;
                 }
@@ -293,6 +383,7 @@
                         }
                         state.selected = null;
                         render();
+                        if (!hasValidMoves()) showModal('Draw from stock or start a new game to continue.');
                     }
                     return;
                 }
@@ -346,11 +437,25 @@
                         }
                         state.selected = null;
                         render();
+                        if (!hasValidMoves()) showModal('Draw from stock or start a new game to continue.');
                     }
+                }
+
+                if (!hasValidMoves()) {
+                    showModal('Draw from stock or start a new game to continue.');
                 }
             });
 
-            S_ROOT.querySelector('#new-game').addEventListener('click', startGame);
+            S_ROOT.addEventListener('click', function(e) {
+                if (e.target && e.target.id === 'solitaire-modal-close') {
+                    closeModal();
+                }
+            });
+
+            S_ROOT.querySelector('#new-game').addEventListener('click', function() {
+                closeModal();
+                startGame();
+            });
             startGame();
         })();
     </script>
