@@ -1,6 +1,6 @@
 (async () => {
-  // Use relative path for subfolder hosting (GitHub Pages)
-  const response = await fetch('apps/appmanager/apps.json');
+  // Use relative path from /os/userspace/uspace.html to the root
+  const response = await fetch('../../apps/appmanager/apps.json');
   const apps = await response.json();
   const dock = document.getElementById("dock");
 
@@ -10,7 +10,9 @@
     .forEach(app => {
     const appElement = document.createElement('div');
     appElement.className = 'dock-item';
-    appElement.innerHTML = `<img src="${app.icon}" style="width:40px; height:40px; border-radius:8px;">`;    appElement.style.cssText = `
+    
+    // Resolve icon relative to the root (two levels up from uspace.html)
+    appElement.innerHTML = `<img src="../../${app.icon}" style="width:40px; height:40px; border-radius:8px;">`;    appElement.style.cssText = `
       width: 50px; height: 50px;
       display: flex; align-items: center;
       justify-content: center;
@@ -19,11 +21,12 @@
     `;
 
     appElement.onclick = () => {
-      fetch(app.path)
+      // Resolve app manifest relative to root
+      fetch('../../' + app.path)
         .then(r => r.json())
         .then(appData => {
           // Resolve relative to repo root
-          const indexPath = appData.files['index.html'];
+          const indexPath = '../../' + appData.files['index.html'];
           fetch(indexPath)
             .then(r => r.text())
             .then(html => createWindow(appData.manifest.name, html))
