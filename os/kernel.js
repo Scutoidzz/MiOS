@@ -151,17 +151,6 @@ function createWindow(title, content) {
 
   win.querySelector('.close').addEventListener('click', () => win.remove());
 
-  // Some windows don't render a minimize button in the titlebar.
-  // Guard the handler so launching an app doesn't throw and bubble up
-  // as a misleading "Failed to load app HTML" error.
-  const minimizeBtn = win.querySelector('.minimize');
-  if (minimizeBtn) {
-    minimizeBtn.addEventListener('click', () => {
-      const content = win.querySelector('.content');
-      content.style.display = content.style.display === 'none' ? 'block' : 'none';
-    });
-  }
-
   win.addEventListener('mousedown', () => TopZ(win));
 
   document.body.appendChild(win);
