@@ -1,4 +1,5 @@
 # MiOS
+###### TO FLAVORTOWN REVIEWERS: PLEASE HARD RELOAD IF YOU'VE VISITED THIS PAGE BEFORE (CTRL + SHIFT + R)
 ### Trashy WebOS written in vanilla HTML
 
 ### TroubleShooting / Skill issue
