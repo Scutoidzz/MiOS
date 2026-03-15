@@ -10,8 +10,8 @@ function createWindow(title, content) {
   win.classList.add('window');
   win.style.cssText = `
     position: absolute;
-    width: 400px;
-    height: 260px;
+    width: 460px;
+    height: 320px;
     background: var(--window-bg, white);
     border-radius: 10px;
     overflow: hidden;
@@ -138,7 +138,11 @@ function createWindow(title, content) {
   win.querySelector('.maximize').addEventListener('click', () => {
     if (!isMaximized) {
       savedStyle = { width: win.style.width, height: win.style.height, top: win.style.top, left: win.style.left };
-      win.style.cssText += 'width: 100vw; height: 100vh; top: 0; left: 0; border-radius: 0;';
+      win.style.width = '100vw';
+      win.style.height = 'calc(100vh - 48px)';
+      win.style.top = '0';
+      win.style.left = '0';
+      win.style.borderRadius = '0';
     } else {
       win.style.width = savedStyle.width;
       win.style.height = savedStyle.height;
