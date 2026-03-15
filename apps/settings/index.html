@@ -8,8 +8,9 @@
     body {
       margin: 0;
       font-family: Arial, Helvetica, sans-serif;
-      background: #f4f4f7;
-      color: #1e1e1e;
+      background: var(--settings-bg, #f4f4f7);
+      color: var(--settings-text, #1e1e1e);
+      transition: background-color 0.2s ease, color 0.2s ease;
     }
 
     .settings {
@@ -18,8 +19,8 @@
     }
 
     .card {
-      background: #fff;
-      border: 1px solid #ddd;
+      background: var(--settings-card-bg, #fff);
+      border: 1px solid var(--settings-border, #ddd);
       border-radius: 8px;
       padding: 12px;
       box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
@@ -34,18 +35,27 @@
     }
 
     button {
-      border: 1px solid #bbb;
+      border: 1px solid var(--settings-border, #bbb);
       border-radius: 6px;
-      background: #fafafa;
+      background: var(--settings-btn-bg, #fafafa);
       padding: 6px 10px;
       cursor: pointer;
     }
 
     .muted {
-      color: #666;
+      color: var(--settings-muted, #666);
       font-size: 12px;
       margin: 4px 0 0;
     }
+
+    select {
+      border: 1px solid var(--settings-border, #bbb);
+      border-radius: 6px;
+      background: var(--settings-btn-bg, #fafafa);
+      color: inherit;
+      padding: 4px 8px;
+    }
+
   </style>
 </head>
 <body>
@@ -84,16 +94,25 @@
       var toggleMusic = document.getElementById('toggle-music');
       var musicStatus = document.getElementById('music-status');
 
+      function setSettingsTheme(theme) {
+        var isDark = theme === 'dark';
+        document.documentElement.style.setProperty('--settings-bg', isDark ? '#17181b' : '#f4f4f7');
+        document.documentElement.style.setProperty('--settings-text', isDark ? '#e5e7eb' : '#1e1e1e');
+        document.documentElement.style.setProperty('--settings-card-bg', isDark ? '#202228' : '#ffffff');
+        document.documentElement.style.setProperty('--settings-border', isDark ? '#3d4049' : '#dddddd');
+        document.documentElement.style.setProperty('--settings-btn-bg', isDark ? '#2a2d34' : '#fafafa');
+        document.documentElement.style.setProperty('--settings-muted', isDark ? '#a9b0bc' : '#666666');
+      }
+
       function setTheme(theme) {
-        if (theme === 'dark') {
-          root.style.setProperty('--window-bg', '#1f2023');
-          root.style.setProperty('--titlebar-bg', '#34363b');
-          root.style.setProperty('--titlebar-color', '#f5f5f5');
+        var targetTheme = theme === 'dark' ? 'dark' : 'light';
+        if (window.parent && window.parent.MiOSTheme && typeof window.parent.MiOSTheme.apply === 'function') {
+          targetTheme = window.parent.MiOSTheme.apply(targetTheme);
         } else {
-          root.style.setProperty('--window-bg', '#ffffff');
-          root.style.setProperty('--titlebar-bg', '#ccc2c2');
-          root.style.setProperty('--titlebar-color', '#ffffff');
+          root.classList.toggle('dark-theme', targetTheme === 'dark');
         }
+        setSettingsTheme(targetTheme);
+        themeSelect.value = targetTheme;
       }
 
       themeSelect.addEventListener('change', function () {
@@ -118,7 +137,10 @@
         }
       });
 
-      setTheme(themeSelect.value);
+      var savedTheme = window.parent && window.parent.MiOSTheme && typeof window.parent.MiOSTheme.get === 'function'
+        ? window.parent.MiOSTheme.get()
+        : themeSelect.value;
+      setTheme(savedTheme);
     })();
   </script>
 </body>
